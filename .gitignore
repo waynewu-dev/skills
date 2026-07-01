@@ -1,5 +1,7 @@
-# 工作区 gitignore — 只提交 retail-marketing 目录
+# 工作区 gitignore — 只提交 skill 目录
 *
 !retail-marketing/
 !retail-marketing/**
+!retail-review/
+!retail-review/**
 !.gitignore
