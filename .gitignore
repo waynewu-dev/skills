@@ -1,0 +1,5 @@
+# 工作区 gitignore — 只提交 SKILL 目录
+*
+!SKILL/
+!SKILL/**
+!.gitignore

@@ -1,0 +1,39 @@
+{
+  "_comment": "品牌配置文件。修改此文件以适配不同品牌风格。生成营销材料时自动套用。",
+  "brand": {
+    "name": "瑞幸咖啡",
+    "slogan": "幸运在握",
+    "logo_url": "",
+    "logo_alt_text": "瑞幸咖啡"
+  },
+  "colors": {
+    "primary": "#0066B3",
+    "primary_light": "#CCE0F5",
+    "primary_dark": "#004C8C",
+    "secondary": "#3D3D3D",
+    "accent": "#FF6B35",
+    "background": "#F5F8FC",
+    "text": "#333333",
+    "text_light": "#666666",
+    "white": "#FFFFFF",
+    "border": "#D8E6F3"
+  },
+  "typography": {
+    "title_font": "PingFang SC, Microsoft YaHei, sans-serif",
+    "body_font": "PingFang SC, Microsoft YaHei, sans-serif",
+    "title_size": "20px",
+    "heading_size": "17px",
+    "body_size": "15px",
+    "caption_size": "12px"
+  },
+  "contact": {
+    "phone": "400-002-1600",
+    "wechat_qr_url": "",
+    "mini_program_name": "瑞幸咖啡",
+    "mini_program_path": "/pages/index/index",
+    "store_address": "全国门店"
+  },
+  "social": {
+    "official_account_name": "瑞幸咖啡"
+  }
+}

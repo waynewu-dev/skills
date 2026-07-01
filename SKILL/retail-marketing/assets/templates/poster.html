@@ -1,0 +1,691 @@
+<!--
+  朋友圈海报模板（中间文件 — 截图后导出为 PNG）
+  支持两种尺寸： portrait (1080x1920) / square (1080x1080)
+  本文件为 HTML 中间产物，通过浏览器截图后输出为 PNG 图片交付用户。
+  变量替换规则（同 article.html 变量命名一致）：
+    {{BRAND_NAME}}        品牌名称
+    {{BRAND_COLOR}}       品牌主色
+    {{BRAND_COLOR_DARK}}  主色深色
+    {{BRAND_COLOR_LIGHT}} 主色浅色
+    {{ACCENT_COLOR}}      强调色
+    {{POSTER_TITLE}}      海报主标题
+    {{POSTER_SUBTITLE}}   副标题
+    {{POSTER_HIGHLIGHT}}  核心卖点/价格（大字展示）
+    {{POSTER_BODY}}       正文/活动说明
+    {{CTA_SHORT}}         简短CTA（4-8字）
+    {{LOGO_URL}}          Logo URL
+    {{LOGO_ALT}}          Logo替代文字
+    {{QR_URL}}            二维码URL（用户提供的图/搜索到的图/默认二维码base64。默认二维码路径：assets/images/default-qr-code.png）
+    {{POSTER_STYLE}}      视觉风格：gradient | minimal | bold | overlay
+    {{WHITE}}             白色
+    {{TEXT_COLOR}}        正文色
+    {{TEXT_LIGHT}}        浅文字色
+    {{TITLE_FONT}}        标题字体
+    {{BODY_FONT}}         正文字体
+    {{POSTER_SIZE}}       尺寸：portrait | square
+    {{POSTER_BG_IMAGE}}   海报背景图 base64（可选，渐变/促销风格的全幅背景。overlay 风格下作为底色层背景）
+    {{POSTER_PRODUCT_IMAGE}} 产品主图 base64（可选。overlay 风格下居中大图展示；极简风格下的产品居中展示）
+    {{POSTER_EN_TITLE}}   英文副标题（overlay 风格专用）
+    {{POSTER_LEFT_TAGS}}  左侧标签文本（overlay 风格专用）
+    {{POSTER_RIGHT_TAG}}  右侧标签文本（overlay 风格专用）
+    {{POSTER_BOTTOM_SLOGAN}} 底部标语（overlay 风格专用）
+    {{POSTER_NUMBER}}     序号（overlay 风格专用，如 "01"）
+    {{OVERLAY_BG_COLOR}}  叠加风格背景色（overlay 风格专用，默认品牌色系变体）
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* 尺寸配置 */
+  :root {
+    --poster-width: 1080px;
+    --poster-height: 1920px;
+    --scale: 1;
+  }
+  .poster-square {
+    --poster-width: 1080px;
+    --poster-height: 1080px;
+  }
+
+  .poster-wrapper {
+    width: var(--poster-width);
+    height: var(--poster-height);
+    position: relative;
+    overflow: hidden;
+    font-family: {{BODY_FONT}};
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== 风格：gradient（渐变风格，默认） ===== */
+  .poster-gradient {
+    background: linear-gradient(135deg, {{BRAND_COLOR}}, {{BRAND_COLOR_DARK}});
+    color: {{WHITE}};
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 120px 80px;
+    position: relative;
+  }
+  .poster-gradient.has-bg {
+    background: linear-gradient(135deg, rgba(0,0,0,0.35), rgba(0,0,0,0.5)), url({{POSTER_BG_IMAGE}}) center/cover no-repeat;
+  }
+  .poster-gradient .brand-logo {
+    position: absolute;
+    top: 80px;
+    left: 80px;
+    height: 48px;
+    opacity: 0.9;
+  }
+  .poster-gradient .watermark {
+    position: absolute;
+    transform: rotate(-30deg);
+    font-size: 180px;
+    font-weight: 900;
+    opacity: 0.04;
+    color: {{WHITE}};
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .poster-gradient .highlight-number {
+    font-family: {{TITLE_FONT}};
+    font-size: 160px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 10px;
+    letter-spacing: -4px;
+  }
+  .poster-gradient .main-title {
+    font-family: {{TITLE_FONT}};
+    font-size: 72px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+  .poster-gradient .sub-title {
+    font-size: 36px;
+    opacity: 0.85;
+    margin-bottom: 60px;
+  }
+  .poster-gradient .body-text {
+    font-size: 30px;
+    opacity: 0.8;
+    margin-bottom: 80px;
+    line-height: 1.6;
+    max-width: 80%;
+  }
+  .poster-gradient .cta-badge {
+    background: {{WHITE}};
+    color: {{BRAND_COLOR}};
+    padding: 24px 64px;
+    border-radius: 50px;
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: 4px;
+  }
+  .poster-gradient .footer-area {
+    position: absolute;
+    bottom: 80px;
+    width: 100%;
+    text-align: center;
+  }
+  .poster-gradient .footer-text {
+    font-size: 24px;
+    opacity: 0.6;
+  }
+
+  /* ===== 风格：minimal（极简风格） ===== */
+  .poster-minimal {
+    background: {{WHITE}};
+    color: {{TEXT_COLOR}};
+    display: flex;
+    flex-direction: column;
+    padding: 100px 80px;
+  }
+  .poster-minimal .top-line {
+    width: 60px;
+    height: 4px;
+    background: {{BRAND_COLOR}};
+    margin-bottom: 40px;
+  }
+  .poster-minimal .main-title {
+    font-family: {{TITLE_FONT}};
+    font-size: 80px;
+    font-weight: 300;
+    line-height: 1.15;
+    margin-bottom: 24px;
+    letter-spacing: 2px;
+  }
+  .poster-minimal .main-title strong {
+    color: {{BRAND_COLOR}};
+    font-weight: 700;
+  }
+  .poster-minimal .sub-title {
+    font-size: 32px;
+    color: {{TEXT_LIGHT}};
+    margin-bottom: 80px;
+    font-weight: 300;
+  }
+  .poster-minimal .spacer {
+    flex: 1;
+  }
+  .poster-minimal .product-image {
+    width: 700px;
+    height: 700px;
+    margin: 0 auto 60px;
+    border-radius: 20px;
+    background: url({{POSTER_PRODUCT_IMAGE}}) center/cover no-repeat;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+  }
+  .poster-minimal .highlight-block {
+    margin-bottom: 80px;
+  }
+  .poster-minimal .highlight-number {
+    font-family: {{TITLE_FONT}};
+    font-size: 140px;
+    font-weight: 900;
+    color: {{BRAND_COLOR}};
+    line-height: 1;
+  }
+  .poster-minimal .highlight-label {
+    font-size: 28px;
+    color: {{TEXT_LIGHT}};
+    margin-top: 8px;
+  }
+  .poster-minimal .cta-line {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 28px;
+    color: {{TEXT_LIGHT}};
+  }
+  .poster-minimal .cta-arrow {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: {{BRAND_COLOR}};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: {{WHITE}};
+    font-size: 24px;
+  }
+  .poster-minimal .brand-logo {
+    position: absolute;
+    top: 80px;
+    right: 80px;
+    height: 40px;
+    opacity: 0.5;
+  }
+
+  /* ===== 风格：bold（大胆促销风格） ===== */
+  .poster-bold {
+    background: {{WHITE}};
+    color: {{TEXT_COLOR}};
+    display: flex;
+    flex-direction: column;
+  }
+  .poster-bold .hero-strip {
+    background: linear-gradient(135deg, {{BRAND_COLOR}}, {{BRAND_COLOR_DARK}});
+    color: {{WHITE}};
+    padding: 100px 80px 80px;
+    text-align: center;
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+  }
+  .poster-bold.has-bg .hero-strip {
+    background: linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url({{POSTER_BG_IMAGE}}) center/cover no-repeat;
+  }
+  .poster-bold .hero-strip .starburst {
+    display: inline-block;
+    background: {{ACCENT_COLOR}};
+    color: {{WHITE}};
+    padding: 14px 40px;
+    border-radius: 40px;
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    margin-bottom: 30px;
+    transform: rotate(-3deg);
+  }
+  .poster-bold .hero-strip .main-title {
+    font-family: {{TITLE_FONT}};
+    font-size: 88px;
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: 2px;
+  }
+  .poster-bold .hero-strip .sub-title {
+    font-size: 36px;
+    opacity: 0.9;
+    margin-top: 20px;
+  }
+  .poster-bold .body-area {
+    flex: 1;
+    padding: 60px 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .poster-bold .body-text {
+    font-size: 32px;
+    line-height: 1.7;
+    color: {{TEXT_LIGHT}};
+    margin-bottom: 40px;
+  }
+  .poster-bold .price-block {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+  .poster-bold .price-now {
+    font-size: 120px;
+    font-weight: 900;
+    color: {{BRAND_COLOR}};
+    line-height: 1;
+  }
+  .poster-bold .price-now small {
+    font-size: 48px;
+  }
+  .poster-bold .price-original {
+    font-size: 36px;
+    color: {{TEXT_LIGHT}};
+    text-decoration: line-through;
+  }
+  .poster-bold .brand-logo {
+    position: absolute;
+    top: 60px;
+    left: 80px;
+    height: 40px;
+  }
+  .poster-bold .qr-area {
+    position: absolute;
+    bottom: 60px;
+    right: 80px;
+    text-align: center;
+    font-size: 22px;
+    color: {{TEXT_LIGHT}};
+  }
+  .poster-bold .qr-code {
+    width: 120px;
+    height: 120px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ===== 风格：overlay（产品图叠层风格） =====
+     特点：产品大图居中，文字分布在周围，背景明亮干净。
+     适合：新品上市、品牌形象海报。
+     尺寸：1080×1440px（紧凑竖版） */
+  .poster-overlay {
+    --poster-height: 1440px;
+  }
+  .poster-overlay .style-overlay {
+    background: linear-gradient(160deg, #FFFFFF 0%, {{BRAND_COLOR_LIGHT}}22 40%, #FFFFFF 70%, {{BRAND_COLOR_LIGHT}}18 100%);
+    color: {{TEXT_COLOR}};
+    position: relative;
+    overflow: hidden;
+  }
+  /* 装饰色块 — 使用品牌浅色，极低透明度 */
+  .poster-overlay .accent-shape {
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: {{BRAND_COLOR_LIGHT}};
+    opacity: 0.12;
+    z-index: 0;
+  }
+  .poster-overlay .accent-shape-bottom {
+    position: absolute;
+    bottom: -300px; left: -300px;
+    width: 800px; height: 800px;
+    border-radius: 50%;
+    background: {{BRAND_COLOR_LIGHT}};
+    opacity: 0.08;
+    z-index: 0;
+  }
+  /* 顶部区域 */
+  .poster-overlay .top-area {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    padding: 50px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    z-index: 10;
+  }
+  .poster-overlay .brand-logo-text {
+    font-size: 28px;
+    font-weight: 700;
+    color: {{BRAND_COLOR}};
+    letter-spacing: 2px;
+  }
+  .poster-overlay .title-number {
+    width: 48px; height: 48px;
+    border: 2px solid {{BRAND_COLOR}};
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 700;
+    color: {{BRAND_COLOR}};
+    opacity: 0.8;
+  }
+  /* 标题区域 */
+  .poster-overlay .title-section {
+    position: absolute;
+    top: 120px;
+    left: 60px; right: 60px;
+    text-align: center;
+    z-index: 10;
+  }
+  .poster-overlay .main-title {
+    font-family: {{TITLE_FONT}};
+    font-size: 64px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 12px;
+    color: {{BRAND_COLOR_DARK}};
+  }
+  .poster-overlay .main-title strong {
+    color: {{ACCENT_COLOR}};
+  }
+  .poster-overlay .sub-title {
+    font-size: 32px;
+    font-weight: 400;
+    color: {{TEXT_COLOR}};
+    margin-bottom: 12px;
+  }
+  .poster-overlay .sub-title-tag {
+    display: inline-block;
+    background: {{BRAND_COLOR}};
+    color: {{WHITE}};
+    padding: 8px 24px;
+    border-radius: 20px;
+    font-size: 24px;
+    font-weight: 600;
+  }
+  .poster-overlay .en-title {
+    font-size: 18px;
+    font-weight: 300;
+    color: {{TEXT_LIGHT}};
+    opacity: 0.7;
+    letter-spacing: 2px;
+    margin-top: 8px;
+  }
+  /* 产品大图 */
+  .poster-overlay .product-hero {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .poster-overlay .product-hero img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15));
+  }
+  /* 左侧标签（卖点/原料） */
+  .poster-overlay .left-tags {
+    position: absolute;
+    left: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+  }
+  .poster-overlay .tag-item {
+    font-size: 24px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    color: {{TEXT_COLOR}};
+  }
+  .poster-overlay .tag-item .tag-main {
+    font-weight: 600;
+    color: {{BRAND_COLOR_DARK}};
+  }
+  .poster-overlay .tag-item .tag-sub {
+    display: block;
+    font-size: 16px;
+    color: {{TEXT_LIGHT}};
+    margin-top: 2px;
+    font-weight: 300;
+  }
+  /* 右侧标签 */
+  .poster-overlay .right-tags {
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+  }
+  .poster-overlay .side-tag {
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    padding: 12px 24px;
+    border-radius: 28px;
+    font-size: 22px;
+    font-weight: 600;
+    color: {{BRAND_COLOR_DARK}};
+    margin-bottom: 12px;
+    display: block;
+    text-align: center;
+    border: 2px solid {{BRAND_COLOR}};
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  }
+  /* 底部区域 */
+  .poster-overlay .bottom-area {
+    position: absolute;
+    bottom: 180px;
+    left: 60px; right: 200px;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .poster-overlay .bottom-slogan {
+    font-size: 36px;
+    font-weight: 700;
+    color: {{BRAND_COLOR_DARK}};
+    margin-bottom: 4px;
+  }
+  .poster-overlay .bottom-slogan-en {
+    font-size: 18px;
+    color: {{TEXT_LIGHT}};
+    opacity: 0.6;
+    font-weight: 300;
+  }
+  .poster-overlay .bottom-right {
+    text-align: right;
+  }
+  .poster-overlay .price-overlay {
+    font-size: 72px;
+    font-weight: 900;
+    line-height: 1;
+    color: {{ACCENT_COLOR}};
+    white-space: nowrap;
+  }
+  .poster-overlay .price-label {
+    font-size: 22px;
+    color: {{TEXT_LIGHT}};
+    margin-top: 4px;
+  }
+  .poster-overlay .qr-area {
+    position: absolute;
+    bottom: 30px;
+    right: 60px;
+    z-index: 10;
+    text-align: center;
+  }
+  .poster-overlay .qr-code {
+    width: 120px;
+    height: 120px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: {{WHITE}};
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .poster-overlay .qr-code img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+  }
+  .poster-overlay .qr-placeholder {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    color: {{TEXT_LIGHT}};
+    background: #f8f8f8;
+  }
+  .poster-overlay .qr-label {
+    font-size: 18px;
+    color: {{TEXT_LIGHT}};
+    margin-top: 6px;
+  }
+
+  /* ===== 风格内容显示控制 ===== */
+  .style-content {
+    display: none;
+    width: 100%;
+    height: 100%;
+  }
+  .poster-gradient .style-content.style-gradient { display: flex; }
+  .poster-minimal .style-content.style-minimal { display: flex; }
+  .poster-bold .style-content.style-bold { display: flex; }
+  .poster-overlay .style-content.style-overlay { display: block; }
+
+  /* 通用底部信息 */
+  .poster-footer {
+    position: absolute;
+    bottom: 60px;
+    left: 80px;
+    right: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-size: 22px;
+    color: {{TEXT_LIGHT}};
+  }
+  .qr-code-placeholder {
+    width: 140px;
+    height: 140px;
+    background: {{WHITE}};
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: {{TEXT_LIGHT}};
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+</style>
+</head>
+<body>
+<div class="poster-wrapper poster-{{POSTER_STYLE}} {{POSTER_SIZE_CLASS}}">
+  <!-- gradient 风格 -->
+  <div class="style-content style-gradient">
+    <div class="watermark">{{BRAND_NAME}}</div>
+    <img class="brand-logo" src="{{LOGO_URL}}" alt="{{LOGO_ALT}}">
+    <div class="highlight-number">{{POSTER_HIGHLIGHT}}</div>
+    <div class="main-title">{{POSTER_TITLE}}</div>
+    <div class="sub-title">{{POSTER_SUBTITLE}}</div>
+    <div class="body-text">{{POSTER_BODY}}</div>
+    <div class="cta-badge">{{CTA_SHORT}}</div>
+    <div class="footer-area">
+      <div class="footer-text">{{BRAND_NAME}} · {{BRAND_SLOGAN}}</div>
+    </div>
+  </div>
+
+  <!-- minimal 风格 -->
+  <div class="style-content style-minimal">
+    <img class="brand-logo" src="{{LOGO_URL}}" alt="{{LOGO_ALT}}">
+    <div class="top-line"></div>
+    <div class="main-title">{{POSTER_TITLE}}</div>
+    <div class="sub-title">{{POSTER_SUBTITLE}}</div>
+    <div class="spacer"></div>
+    <div class="product-image" style="background-image: url({{POSTER_PRODUCT_IMAGE}})"></div>
+    <div class="highlight-block">
+      <div class="highlight-number">{{POSTER_HIGHLIGHT}}</div>
+      <div class="highlight-label">{{POSTER_HIGHLIGHT_LABEL}}</div>
+    </div>
+    <div class="cta-line">
+      <span>{{CTA_SHORT}}</span>
+      <div class="cta-arrow">→</div>
+    </div>
+  </div>
+
+  <!-- bold 风格 -->
+  <div class="style-content style-bold">
+    <img class="brand-logo" src="{{LOGO_URL}}" alt="{{LOGO_ALT}}">
+    <div class="hero-strip">
+      <div class="starburst">{{POSTER_TAG}}</div>
+      <div class="main-title">{{POSTER_TITLE}}</div>
+      <div class="sub-title">{{POSTER_SUBTITLE}}</div>
+    </div>
+    <div class="body-area">
+      <div class="body-text">{{POSTER_BODY}}</div>
+      <div class="price-block">
+        <div class="price-now"><small>¥</small>{{POSTER_PRICE}}</div>
+        <div class="price-original">¥{{POSTER_PRICE_ORIGINAL}}</div>
+      </div>
+    </div>
+    <div class="qr-area">
+      <div class="qr-code"><img src="{{QR_URL}}" alt="小程序码"></div>
+      <div>{{QR_LABEL}}</div>
+    </div>
+  </div>
+
+  <!-- overlay 风格 -->
+  <div class="style-content style-overlay">
+    <div class="accent-shape"></div>
+    <div class="accent-shape-bottom"></div>
+
+    <div class="top-area">
+      <div class="brand-logo-text">{{BRAND_NAME}}</div>
+      <div class="title-number">{{POSTER_NUMBER}}</div>
+    </div>
+
+    <div class="title-section">
+      <div class="main-title">{{POSTER_TITLE}}</div>
+      <div class="sub-title">{{POSTER_SUBTITLE}}</div>
+      <div class="sub-title-tag">{{POSTER_TAG}}</div>
+      <div class="en-title">{{POSTER_EN_TITLE}}</div>
+    </div>
+
+    <div class="product-hero">
+      <img src="{{POSTER_PRODUCT_IMAGE}}" alt="{{POSTER_TITLE}}">
+    </div>
+
+    <div class="left-tags">{{POSTER_LEFT_TAGS}}</div>
+    <div class="right-tags">{{POSTER_RIGHT_TAG}}</div>
+
+    <div class="bottom-area">
+      <div>
+        <div class="bottom-slogan">{{POSTER_BOTTOM_SLOGAN}}</div>
+        <div class="bottom-slogan-en">{{POSTER_EN_TITLE}}</div>
+      </div>
+      <div class="bottom-right">
+        <div class="price-overlay">{{POSTER_HIGHLIGHT}}</div>
+        <div class="price-label">{{POSTER_PRICE_LABEL}}</div>
+      </div>
+    </div>
+
+    <div class="qr-area">
+      <div class="qr-code"><img src="{{QR_URL}}" alt="小程序码"></div>
+      <div class="qr-label">{{QR_LABEL}}</div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
